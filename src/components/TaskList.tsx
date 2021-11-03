@@ -1,29 +1,110 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react';
+import {v4 as uuidv4} from 'uuid';
 
 import '../styles/tasklist.scss'
 
 import { FiTrash, FiCheckSquare } from 'react-icons/fi'
 
 interface Task {
-  id: number;
+  id: string;
   title: string;
   isComplete: boolean;
 }
+
+let geral = 0;
 
 export function TaskList() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
 
+  useEffect(() => {
+    console.log(tasks)
+  }, [tasks])
+
   function handleCreateNewTask() {
     // Crie uma nova task com um id random, não permita criar caso o título seja vazio.
+
+    if(newTaskTitle){
+
+      const filtro =
+        tasks.filter(task => {
+          return (
+            newTaskTitle == task.title
+          )
+        })
+
+        console.log(`aaaaaaaaa`,filtro)
+      
+
+      if(filtro.length == 0){
+
+        setTasks(taskAntiga =>
+          [
+            ...taskAntiga,
+            {
+              id: uuidv4(),
+              title: newTaskTitle,
+              isComplete: false
+            },
+          ]
+        );
+      }
+    }
+    
   }
 
-  function handleToggleTaskCompletion(id: number) {
+  function handleToggleTaskCompletion(id: string) {
     // Altere entre `true` ou `false` o campo `isComplete` de uma task com dado ID
+    
+    const temp = [...tasks]
+
+    console.log("temp", temp)
+
+    const index = tasks.findIndex(task => { //obj
+      return task.id === id
+    })
+
+    console.log("tempindex", temp[index])
+    
+    temp[index] = {...temp[index], }
+
+    // OUTRA FORMA DE FAZER:
+
+    // const temp2 = [...tasks].map(task => {
+    //   if(task.id === id){
+    //     task.isComplete = !task.isComplete
+    //   }
+    //   return task
+    // })
+
+    console.log(temp)
+
+    //
+    
+    setTasks([...temp]) //bom deixar o ..., senao a temp e tasks ficam interligados.
   }
 
-  function handleRemoveTask(id: number) {
+  /* ALTERAÇÃO/EDIÇÃO NO OBJ
+  const temp2 = [...tasks].map(task => {
+      if(task.id === id){
+        task = {...task, title: "teste", isComplete: !task.isComplete}
+        return task
+      }
+      return task
+    })
+  */
+
+  function handleRemoveTask(id: string) {
+    //1 OPÇÃO
     // Remova uma task da listagem pelo ID
+    // const temp = [...tasks]
+    // const index = tasks.findIndex(task => task.id === id)
+    // temp.splice(index, 1)//2º argumento é a quantidade de elementos excluidos
+    
+    //2 OPÇÃO
+    const temp = [...tasks].filter(task => id != task.id)
+
+    setTasks([...temp])
   }
 
   return (
